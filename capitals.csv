@@ -1,0 +1,51 @@
+city,iata_faa,latitude,longitude,state,zone
+Albany,ALB,42.7483,-73.8017,New York,-5
+Annapolis,ANP,38.9403,-76.5644,Maryland,NA
+Atlanta,ATL,33.6367,-84.4281,Georgia,-5
+Augusta,AUG,44.3206,-69.7973,Maine,-5
+Austin,AUS,30.1945,-97.6699,Texas,-6
+Baton Rouge,BTR,30.5332,-91.1496,Louisiana,-6
+Bismarck,BIS,46.7758,-100.758,North Dakota,-6
+Boise,BOI,43.5644,-116.223,Idaho,-7
+Boston,BOS,42.3643,-71.0052,Massachusetts,-5
+Carson City,CSN,39.1922,-119.734,Nevada,NA
+Charleston,CHS,32.8986,-80.0405,West Virginia,-5
+Cheyenne,CYS,41.1557,-104.812,Wyoming,-7
+Columbia,COU,38.8181,-92.2196,South Carolina,-6
+Columbus,LCK,39.8138,-82.9278,Ohio,-5
+Concord,CON,43.2028,-71.5022,New Hampshire,-5
+Denver,DEN,39.8617,-104.673,Colorado,-7
+Des Moines,DSM,41.534,-93.6631,Iowa,-6
+Dover,DOV,39.1295,-75.466,Delaware,-5
+Frankfort,FFT,38.1819,-76.5644,Kentucky,NA
+Harrisburg,MDT,40.1935,-76.7634,Pennsylvania,-5
+Hartford,BDL,41.9392,-72.6833,Connecticut,-5
+Helena,HLN,46.6068,-111.983,Montana,-7
+Honolulu,HNL,21.3187,-157.922,Hawaii,-10
+Indianapolis,IND,39.7173,-86.2944,Indiana,-5
+Jackson,JAN,32.3112,-90.0759,Mississippi,-6
+Jefferson City,JEF,38.5912,-92.1561,Missouri,-6
+Juneau,JNU,58.355,-134.576,Alaska,-9
+Lansing,LAN,42.7787,-84.5874,Michigan,-5
+Lincoln,LNK,40.851,-96.7592,Nebraska,-6
+Little Rock,LIT,34.7294,-92.2243,Arkansas,-6
+Madison,MSN,43.1399,-89.3375,Wisconsin,-6
+Montgomery,MXF,32.3829,-86.3658,Alabama,-6
+Montpelier,MPV,44.2035,-72.5623,Vermont,-5
+Nashville,BNA,36.1245,-86.6782,Tennessee,-6
+Oklahoma City,TIK,35.4147,-97.3866,Oklahoma,-6
+Olympia,OLM,46.9694,-122.903,Washington,-7
+Phoenix,PHX,33.4343,-112.012,Arizona,-7
+Pierre,PIR,44.3827,-100.286,South Dakota,-6
+Providence,PVD,41.7326,-71.4204,Rhode Island,-5
+Raleigh,RDU,35.8778,-78.7875,North Carolina,NA
+Richmond,RIC,37.5052,-77.3197,Virginia,-5
+Sacramento,MHR,38.5539,-121.298,California,-8
+Saint Paul,STP,44.9344,-93.06,Minnesota,NA
+Salem,SLE,44.9095,-123.003,Oregon,-7
+Salt Lake City,SLC,40.7884,-111.978,Utah,-7
+Santa Fe,SAF,35.6171,-106.089,New Mexico,-7
+Springfield,SPI,39.8441,-89.6779,Illinois,-6
+Tallahassee,TLH,30.3965,-84.3503,Florida,-5
+Topeka,TOP,39.0686,-95.6225,Kansas,-6
+Trenton,TTN,40.2767,-74.8135,New Jersey,-5

@@ -1,0 +1,14 @@
+/* redo if can get submit button lined up
+#postcode {
+width: 130px;
+}
+*/
+.btn-primary {
+  padding-left: 12px; /* is only for padding within div - want it in the div really*/
+  background-color: #00a65a;
+  border-color: #00a65a; /* might want to change from red #dd4b39 */
+}
+.shiny-input-panel {
+  background-color: #F39C12;
+  border-color: #F39C12;
+}
