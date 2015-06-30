@@ -152,3 +152,13 @@ columnDefs = list(list(className = 'dt-right', targets = c(3,4)))))
  #DT::datatable(options=list(paging = TRUE, searching = TRUE,info=FALSE))                                                                  
   
 })
+
+## just the capitals data
+
+output$stateCapitals <- DT::renderDataTable({
+  
+ 
+  
+  capitals %>% 
+    DT::datatable()
+})

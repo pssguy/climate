@@ -305,7 +305,8 @@ output$hotColdChart <- renderPlot({
     scale_fill_manual(name="",
                       values = c("blue","red"),
                       labels=c("Cold Days", "Hot Days"))+
-    
+   scale_y_continuous(breaks= pretty_breaks()) +
+ scale_x_continuous(breaks= pretty_breaks()) +
     xlab("Year")+
     ylab("Days to Date")+
     theme_bw()

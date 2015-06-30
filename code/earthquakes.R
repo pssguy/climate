@@ -7,7 +7,7 @@ formatTime <- function(timeString) {
 
 
 data <- reactive({
-  
+  if(is.null(input$mag)) return()
   invalidateLater(6000000, session)
   
   rawData <-read_csv("http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv",
@@ -66,3 +66,21 @@ output$quakeMap <- renderLeaflet({
     addLegend(pal=binpal,values= ~mag, position='bottomleft',title="Magnitude")
 })
 
+output$myImage <- renderImage({
+  #   # A temp file to save the output.
+  #   # This file will be removed later by renderImage
+  #   outfile <- tempfile(fileext='.png')
+  #   
+  #   # Generate the PNG
+  #   png(outfile, width=400, height=300)
+  #   hist(rnorm(input$obs), main="Generated in renderImage()")
+  #   dev.off()
+  
+  # Return a list containing the filename
+  list(src = 'tectonicPlates.jpg',
+       contentType = 'image/jpg',
+       # 311x162
+       width = 460,
+       height = 240,
+       alt = "")
+}, deleteFile = FALSE)

@@ -14,6 +14,8 @@ library(htmlwidgets)
 library(DT)
 library(stringr)
 library(ggplot2)
+library(scales)
+library(DT)
 
 # load requisite files
 #allStations <- read.csv("allStations_B.csv", stringsAsFactors = F)
@@ -64,6 +66,7 @@ temp_format = htmltools::withTags(table(
 # stateCapitals <- read_csv("stateCapitals.csv")
 
 capitals <- read_csv("capitals.csv")
+
 
 
 stateTemp_format = htmltools::withTags(table(
