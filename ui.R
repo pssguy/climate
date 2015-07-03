@@ -13,7 +13,7 @@ dashboardPage(
       id = "sbMenu",
       
       menuItem(
-        "Earthquakes",
+        "Earthquakes",#badgeLabel="new",badgeColor="green", cannot have with subitems
         menuSubItem("Maps",tabName = "earthquakes", selected = TRUE),
         menuSubItem("Info",tabName = "earthquakes_info")
       ),
@@ -38,8 +38,9 @@ dashboardPage(
       #
       menuItem(
         "Other Dashboards",
+        menuSubItem("Mainly Maps",href = "https://mytinyshinys.shinyapps.io/mainlyMaps"),
         menuSubItem("MLB",href = "https://mytinyshinys.shinyapps.io/mlbCharts"),
-        menuSubItem("Fortune 500",href = "https://mytinyshinys.shinyapps.io/fortune500"),
+       
         menuSubItem("WikiGuardian",href = "https://mytinyshinys.shinyapps.io/wikiGuardian"),
         menuSubItem("World Soccer",href = "https://mytinyshinys.shinyapps.io/worldSoccer")
         

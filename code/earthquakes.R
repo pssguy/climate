@@ -8,7 +8,7 @@ formatTime <- function(timeString) {
 
 data <- reactive({
   if(is.null(input$mag)) return()
-  invalidateLater(6000000, session)
+  invalidateLater(3600000, session)
   
   rawData <-read_csv("http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv",
                      col_types = list(col_character(), col_double(), col_double(),
