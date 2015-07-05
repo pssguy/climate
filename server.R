@@ -10,7 +10,7 @@ shinyServer(function(input, output,session) {
                  radioButtons("tempScale","",c("Celsius","Fahrenheit"),inline= TRUE)
       ) 
     } else if (input$sbMenu=="statetemps") {
-      inputPanel(id="ip3",radioButtons("tempScale2","Select Scale",c("Celsius","Fahrenheit"),selected="Fahrenheit",inline= TRUE))
+      inputPanel(id="ip3",radioButtons("tempScale2","Select Scale for Map",c("Celsius","Fahrenheit"),selected="Fahrenheit",inline= TRUE))
     } else if (input$sbMenu=="earthquakes") {
       inputPanel(id="ip2",
                  sliderInput("mag","Enter Magnitude Range",min=2,max=10,value=c(4,10),step=0.5)

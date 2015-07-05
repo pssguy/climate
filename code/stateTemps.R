@@ -157,19 +157,51 @@ columnDefs = list(list(className = 'dt-right', targets = c(3,4)))))
 
 output$hotBox <- renderInfoBox({
   
- hot <- test %>% 
+  print(input$minMax[1])
+  print(input$minMax[2])
+  
+df <- test %>% 
     mutate(TemperatureF=round((TemperatureC*9/5)+32),1) %>% 
-    filter(TemperatureF>=90) %>% 
+    filter(TemperatureF>input$minMax[2]) %>% 
     tally() 
- 
- hot <- hot[1,]$n 
+    
+  hot <- df[1,]$n 
+  
  
   infoBox(
-    "Hot",hot, icon = icon("list"),
+    "Hot",hot, icon = icon("thumbs-down"),
     color = "red"
   )
 })
+output$coldBox <- renderInfoBox({
+  
+  df <- test %>% 
+    mutate(TemperatureF=round((TemperatureC*9/5)+32),1) %>% 
+    filter(TemperatureF<input$minMax[1]) %>% 
+    tally() 
+  
+  cold <- df[1,]$n 
+  
+  infoBox(
+    "Cold",cold, icon = icon("thumbs-down"),
+    color = "blue"
+  )
+})
 
+output$mildBox <- renderInfoBox({
+  
+  df <- test %>% 
+    mutate(TemperatureF=round((TemperatureC*9/5)+32),1) %>% 
+    filter(TemperatureF>input$minMax[1]&TemperatureF<input$minMax[2]) %>% 
+    tally() 
+  
+  mild <- df[1,]$n 
+  
+  infoBox(
+    "Mild",mild, icon = icon("thumbs-up"),
+    color = "green"
+  )
+})
 
 ## just the capitals data
 

@@ -159,6 +159,21 @@ dashboardPage(
     tabItem(
       "statetemps",
       fluidRow(
+        column(width=3,
+               sliderInput("minMax","Select Pleasant Range",min=0,max=110,value=c(60,90),step=10)
+        ),
+        column(width=3,
+        infoBoxOutput("hotBox", width=12)
+        ),
+        column(width=3,
+               infoBoxOutput("mildBox", width=12)
+        ),
+        column(width=3,
+               infoBoxOutput("coldBox", width=12)
+        )
+      ),
+      
+      fluidRow(
         column(width=6,
       
       box(
@@ -167,7 +182,7 @@ dashboardPage(
         title = "Latest Temps (takes few seconds) - Click Circle for value",
         collapsible = FALSE, collapsed = FALSE,
         textOutput("temperatureCheck"),
-        infoBoxOutput("hotBox"),
+        
         leafletOutput("stateTempsMap")
         
       )
