@@ -14,12 +14,12 @@ dashboardPage(
       
       menuItem(
         "Earthquakes",#badgeLabel="new",badgeColor="green", cannot have with subitems
-        menuSubItem("Maps",tabName = "earthquakes", selected = TRUE),
-        menuSubItem("Info",tabName = "earthquakes_info")
+        menuSubItem("Map",tabName = "earthquakes", selected = TRUE, icon = icon("map-marker")),
+        menuSubItem("Info",tabName = "earthquakes_info",icon = icon("info"))
       ),
       menuItem(
         "US State Capital Temperatures",
-        menuSubItem("Maps",tabName = "statetemps", icon = icon("map-marker")),
+        menuSubItem("Map",tabName = "statetemps", icon = icon("map-marker"), selected=TRUE),
         menuSubItem("Info",tabName = "statetemps_info",icon = icon("info")),
         menuSubItem("Data",tabName = "statetemps_data",icon = icon("database"))
       ),
@@ -158,23 +158,31 @@ dashboardPage(
   
     tabItem(
       "statetemps",
+      fluidRow(
+        column(width=6,
+      
       box(
-        width = 6,
+        width = 12,
         status = "success", solidHeader = TRUE,
         title = "Latest Temps (takes few seconds) - Click Circle for value",
         collapsible = FALSE, collapsed = FALSE,
         textOutput("temperatureCheck"),
+        infoBoxOutput("hotBox"),
         leafletOutput("stateTempsMap")
         
+      )
       ),
+      column(width=6,
       box(
-        width = 6,
+        width = 12,
         status = "success", solidHeader = TRUE,
         title = "Refreshes automatically every 10 minutes",
         collapsible = FALSE, collapsed = FALSE,
         
         DT::dataTableOutput("stateTempsTable")
         
+      )
+      )
       )
       
     ),

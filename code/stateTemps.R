@@ -27,7 +27,9 @@ print(capitals$Time[1])
 
 capitals <- capitals %>% 
   mutate(time=str_sub(Time,12,16))
-
+ 
+## write a df 
+write_csv(capitals,"exapmpledf.csv")
 
 info=list(capitals=capitals)
 return(info)
@@ -150,8 +152,24 @@ output$stateTempsTable <- DT::renderDataTable({
     DT::datatable(container=stateTemp_format,options=list(paging = TRUE, searching = TRUE,info=FALSE,
 columnDefs = list(list(className = 'dt-right', targets = c(3,4)))))
  #DT::datatable(options=list(paging = TRUE, searching = TRUE,info=FALSE))                                                                  
-  
 })
+
+
+output$hotBox <- renderInfoBox({
+  
+ hot <- test %>% 
+    mutate(TemperatureF=round((TemperatureC*9/5)+32),1) %>% 
+    filter(TemperatureF>=90) %>% 
+    tally() 
+ 
+ hot <- hot[1,]$n 
+ 
+  infoBox(
+    "Hot",hot, icon = icon("list"),
+    color = "red"
+  )
+})
+
 
 ## just the capitals data
 
