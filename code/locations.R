@@ -15,8 +15,9 @@ getHour = function(data,location,session) {
     if (input$tempScale == "Celsius") {
       theLocData()$met_data %>%
         filter(year == values$theYear &
-                 month == values$theMonth & day == values$theDay) %>%
-        ggvis( ~ hour, ~ temp) %>%
+                 month == values$theMonth &
+                 day == values$theDay) %>%
+        ggvis(~ hour, ~ temp) %>%
         layer_lines() %>%
         layer_points(size = 3) %>%
         
@@ -28,9 +29,10 @@ getHour = function(data,location,session) {
     } else {
       theLocData()$met_data %>%
         filter(year == values$theYear &
-                 month == values$theMonth & day == values$theDay) %>%
+                 month == values$theMonth &
+                 day == values$theDay) %>%
         mutate(temp = temp * 9 / 5 - 32) %>%
-        ggvis( ~ hour, ~ temp) %>%
+        ggvis(~ hour, ~ temp) %>%
         layer_lines() %>%
         layer_points(size = 3) %>%
         
@@ -56,7 +58,8 @@ getDay = function(data,location,session) {
   observe({
     if (input$tempScale == "Celsius") {
       theLocData()$met_data %>%
-        filter(year == values$theYear & month == values$theMonth) %>%
+        filter(year == values$theYear &
+                 month == values$theMonth) %>%
         group_by(day) %>%
         summarize(
           min = min(temp, na.rm = T),max = max(temp, na.rm = T), mean = round(mean(temp, na.rm =
@@ -65,7 +68,8 @@ getDay = function(data,location,session) {
       theTitle <- "temp C"
     } else {
       theLocData()$met_data %>%
-        filter(year == values$theYear & month == values$theMonth) %>%
+        filter(year == values$theYear &
+                 month == values$theMonth) %>%
         mutate(temp = temp * 9 / 5 + 32) %>%
         group_by(day) %>%
         summarize(
@@ -86,12 +90,12 @@ getDay = function(data,location,session) {
     
     dailyAv.gather %>%
       group_by(cats) %>%
-      ggvis( ~ day, ~ temp) %>%
+      ggvis(~ day, ~ temp) %>%
       layer_lines(stroke =  ~ cats) %>%
-      layer_points(size = 10) %>%
+      layer_points() %>%
       add_legend(scales = "stroke",title = "") %>%
       add_axis("y", title = theTitle) %>%
-      add_axis("x", title = "Day of Month", format='d') %>%
+      add_axis("x", title = "Day of Month", format = 'd') %>%
       handle_click(getHour) %>%
       set_options(width = 480) %>%
       bind_shiny("daily")
@@ -104,7 +108,6 @@ getDay = function(data,location,session) {
 
 # this should be start but is not even being entered
 output$locations <- renderLeaflet({
-  
   print("enter locations")
   print(input$country)
   if (is.null(input$country))
@@ -112,7 +115,8 @@ output$locations <- renderLeaflet({
   
   df <-  allStations %>%
     
-    filter(country_name == input$country & begin <= 2013 & end == 2015)
+    filter(country_name == input$country &
+             begin <= 2013 & end == 2015)
   
   df <- data.frame(df)
   df %>%    leaflet() %>%
@@ -128,29 +132,32 @@ output$locations <- renderLeaflet({
 output$a <- renderUI({
   print("enter ui")
   print(input$locations_shape_click$id)
-  if (is.null(input$locations_shape_click$id)) return()
+  if (is.null(input$locations_shape_click$id))
+    return()
   
   # use the clicked state as filter for data
   
   #stateID <-input$choropleth_shape_click$id
   
-   station <-input$locations_shape_click$id
-   print(station)
-    yr1 <- allStations[allStations$stationId==input$locations_shape_click$id,]$begin
-   yr2 <- allStations[allStations$stationId==input$locations_shape_click$id,]$end
-   print(yr1)
-   print(yr2)
-   print("years printed")
+  station <- input$locations_shape_click$id
+  print(station)
+  yr1 <-
+    allStations[allStations$stationId == input$locations_shape_click$id,]$begin
+  yr2 <-
+    allStations[allStations$stationId == input$locations_shape_click$id,]$end
+  print(yr1)
+  print(yr2)
+  print("years printed")
   #yr1 <- 2000
- # yr2 <- 2015
-   inputPanel(
-  sliderInput(
-    "years","Select Years",min = yr1,max = yr2,value = c(yr2 - 2,yr2),sep =
-      "",ticks = FALSE
-  ),
-  
-  actionButton("getYears","Download Data")
-)
+  # yr2 <- 2015
+  inputPanel(id="downloads",
+    sliderInput(
+      "years","Select Years",min = yr1,max = yr2,value = c(yr2 - 2,yr2),sep =
+        "",ticks = FALSE
+    ),
+    
+    actionButton("getYears","Download Data")
+  )
   
 })
 
@@ -181,7 +188,7 @@ theLocData <- eventReactive(input$getYears,{
   
   # print("data received")
   print(glimpse(met_data))
-  info = list(met_data = met_data,year1=year1,year2=year2)
+  info = list(met_data = met_data,year1 = year1,year2 = year2)
   #   print("met_data")
   return(info)
   
@@ -253,11 +260,23 @@ observe({
     theTitle <- "temp F"
   }
   print(nrow(monthlyAv))
+  
+  monthlyAv <- cbind(monthlyAv, id = seq_len(nrow(monthlyAv)))
+  
+  all_values_1 <- function(x) {
+    if (is.null(x))
+      return(NULL)
+    row <-
+      monthlyAv[monthlyAv$id == x$id, c("year","mean","min","max")]
+    paste0(names(row),": ",format(row), collapse = "<br />")
+  }
+  
   monthlyAv %>%
     group_by(year) %>%
-    ggvis( ~ month, ~ mean) %>%
+    ggvis(~ month, ~ mean, key := ~ id) %>%
     layer_points() %>%
     layer_lines(stroke =  ~ as.character(year)) %>%
+    add_tooltip(all_values_1, "hover") %>%
     add_axis("y", title = theTitle) %>%
     add_axis("x", title = "Month") %>%
     add_legend(scales = "stroke",title = "") %>%
@@ -274,24 +293,50 @@ output$hotColdTable <- DT::renderDataTable({
     return()
   
   ## table of min/max
-  hottest <- theLocData()$met_data %>%
-    group_by(year) %>%
-    mutate(maxTemp = max(temp,na.rm = T)) %>%
-    filter(temp == maxTemp) %>%
-    select(
-      year,monthH = month,dayH = day,hourH = hour,tempH = temp
-    ) %>%
-    slice(1)
+  if (input$tempScale == "Celsius") {
+    hottest <- theLocData()$met_data %>%
+      group_by(year) %>%
+      mutate(maxTemp = max(temp,na.rm = T)) %>%
+      filter(temp == maxTemp) %>%
+      select(
+        year,monthH = month,dayH = day,hourH = hour,tempH = temp
+      ) %>%
+      slice(1)
+  } else {
+    hottest <- theLocData()$met_data %>%
+      group_by(year) %>%
+      
+      mutate(temp = (temp * 9 / 5 + 32),maxTemp = max(temp,na.rm = T)) %>%
+      filter(temp == maxTemp) %>%
+      select(
+        year,monthH = month,dayH = day,hourH = hour,tempH = temp
+      ) %>%
+      slice(1)
+  }
   
-  coldest <- theLocData()$met_data %>%
-    group_by(year) %>%
-    mutate(minTemp = min(temp,na.rm = T)) %>%
-    filter(temp == minTemp) %>%
-    select(
-      year,monthC = month,dayC = day,hourC = hour,tempC = temp
-    ) %>%
-    slice(1)
-  
+  if (input$tempScale == "Celsius") {
+    coldest <- theLocData()$met_data %>%
+      group_by(year) %>%
+      mutate(minTemp = min(temp,na.rm = T)) %>%
+      filter(temp == minTemp) %>%
+      select(
+        year,monthC = month,dayC = day,hourC = hour,tempC = temp
+      ) %>%
+      slice(1)
+  } else {
+    coldest <- theLocData()$met_data %>%
+      group_by(year) %>%
+      mutate(temp = (temp * 9 / 5 + 32),minTemp = min(temp,na.rm = T)) %>%
+      filter(temp == minTemp) %>%
+      select(
+        year,monthC = month,dayC = day,hourC = hour,tempC = temp
+      ) %>%
+      slice(1)
+    
+    
+    
+    
+  }
   ## may not be same for every hour
   mean <- theLocData()$met_data %>%
     group_by(year) %>%
@@ -355,11 +400,14 @@ output$hotColdChart <- renderPlot({
   
   print(theLocData()$year1)
   print(theLocData()$year2)
-  reps  <- theLocData()$year2-theLocData()$year1+1
+  reps  <- theLocData()$year2 - theLocData()$year1 + 1
   
   
-  if(nrow(aboveTwenty)==0) {
-    aboveTwenty <- data.frame(year=c(theLocData()$year1:theLocData()$year2),hot =rep(0,reps))
+  if (nrow(aboveTwenty) == 0) {
+    aboveTwenty <-
+      data.frame(
+        year = c(theLocData()$year1:theLocData()$year2),hot = rep(0,reps)
+      )
   }
   
   print(glimpse(aboveTwenty))
@@ -369,6 +417,14 @@ output$hotColdChart <- renderPlot({
   
   #print(glimpse(combo))
   combo$year <- as.integer(combo$year)
+  
+  write_csv(theLocData()$met_data, "test.csv")
+ ## need to revist this 
+ theLocData()$met_data %>% 
+   filter(year==max(year)) %>% 
+   nrow() -> days
+  
+  #yTitle <- paste0(days," days of Year")
   
   p <- ggplot(combo,aes(x = year,y = count,fill = factor(cat))) +
     geom_bar(
@@ -381,9 +437,9 @@ output$hotColdChart <- renderPlot({
     ) +
     scale_y_continuous(breaks = pretty_breaks()) +
     #scale_x_discrete() + issues
-    scale_x_continuous(breaks=c(2013:2015)) +
-    xlab("") +
-    ylab("Days to Date") +
+    scale_x_continuous(breaks = c(2013:2015)) +
+    xlab("January - June") +
+    ylab(yTitle) +
     theme_bw()
   p
 })

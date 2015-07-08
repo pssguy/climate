@@ -137,7 +137,7 @@ dashboardPage(
                         width = 12,
       
                         status = "success", solidHeader = TRUE,
-                        title = "Mean Monthly Temperatures - Click on Point  for Daily Data",
+                        title = "Monthly Means. Hover for Details, Click for Daily data",
                         collapsible = TRUE, collapsed = FALSE,
                         textOutput("monthTitle"),
                         ggvisOutput("monthly")
