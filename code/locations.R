@@ -88,7 +88,7 @@ getDay = function(data,location,session) {
       group_by(cats) %>%
       ggvis( ~ day, ~ temp) %>%
       layer_lines(stroke =  ~ cats) %>%
-      layer_points(size = 8) %>%
+      layer_points(size = 10) %>%
       add_legend(scales = "stroke",title = "") %>%
       add_axis("y", title = theTitle) %>%
       add_axis("x", title = "Day of Month", format='d') %>%
@@ -127,26 +127,41 @@ output$locations <- renderLeaflet({
 
 output$a <- renderUI({
   print("enter ui")
-  # if (is.null(input$locations_shape_clicked$id)) return()
-  print("should work")
+  print(input$locations_shape_click$id)
+  if (is.null(input$locations_shape_click$id)) return()
   
-  # station <-input$locations_shape_click$id
-  #  yr1 <- allStations[stationId==input$locations_shape_click$id,]$begin
-  # yr2 <- allStations[stationId==input$locations_shape_click$id,]$end
-  yr1 <- 2000
-  yr2 <- 2015
+  # use the clicked state as filter for data
+  
+  #stateID <-input$choropleth_shape_click$id
+  
+   station <-input$locations_shape_click$id
+   print(station)
+    yr1 <- allStations[allStations$stationId==input$locations_shape_click$id,]$begin
+   yr2 <- allStations[allStations$stationId==input$locations_shape_click$id,]$end
+   print(yr1)
+   print(yr2)
+   print("years printed")
+  #yr1 <- 2000
+ # yr2 <- 2015
+   inputPanel(
   sliderInput(
     "years","Select Years",min = yr1,max = yr2,value = c(yr2 - 2,yr2),sep =
       "",ticks = FALSE
-  )
+  ),
+  
+  actionButton("getYears","Download Data")
+)
   
 })
 
-theLocData <- reactive({
+theLocData <- eventReactive(input$getYears,{
   print("enter reactive")
   if (is.null(input$locations_shape_click$id))
     return()
   print("station clicked")
+  input$getYears
+  print("inputgetYears")
+  print(input$getYears)
   if (is.null(input$years))
     return()
   print("inputyears1")
@@ -161,12 +176,12 @@ theLocData <- reactive({
   met_data <- get_isd_station_data(
     station_id = station,
     startyear = input$years[1],
-    endyear = input$years[2]
+    endyear = input$years[2]  # tried isolate here did not seem to  work
   )
   
   # print("data received")
   print(glimpse(met_data))
-  info = list(met_data = met_data)
+  info = list(met_data = met_data,year1=year1,year2=year2)
   #   print("met_data")
   return(info)
   
@@ -338,10 +353,13 @@ output$hotColdChart <- renderPlot({
   print(nrow(aboveTwenty))
   print(glimpse(aboveTwenty))
   
+  print(theLocData()$year1)
+  print(theLocData()$year2)
+  reps  <- theLocData()$year2-theLocData()$year1+1
   
   
   if(nrow(aboveTwenty)==0) {
-    aboveTwenty <- data.frame(year=c(2013:2015),hot =rep(0,3))
+    aboveTwenty <- data.frame(year=c(theLocData()$year1:theLocData()$year2),hot =rep(0,reps))
   }
   
   print(glimpse(aboveTwenty))

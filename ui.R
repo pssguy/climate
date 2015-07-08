@@ -96,6 +96,7 @@ dashboardPage(
                       box(
                         width = 12,
                         status = "success", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = FALSE,
                         title = "Click on circle for Station Name and Monthly Temperature Chart",
                         leafletOutput("locations")
       
@@ -103,6 +104,7 @@ dashboardPage(
                       box(
                         width = 12,
                         status = "success", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE,
                         title = "Annual Averages, Highs and Lows",
                         textOutput("monthTitleA"),
                         DT::dataTableOutput("hotColdTable")
@@ -111,6 +113,7 @@ dashboardPage(
                       box(
                         width = 12,
                         status = "success", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE,
                         title = "Days below OC and above 20C - Year to Date",
                         plotOutput("hotColdChart")
       
