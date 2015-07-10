@@ -7,7 +7,8 @@ shinyServer(function(input, output,session) {
     if (input$sbMenu=="stations") {
       inputPanel(id="ip",
                  selectInput("country","Select Country",countryChoice, selected="Canada"),
-                 radioButtons("tempScale","",c("Celsius","Fahrenheit"),inline= TRUE)
+                 radioButtons("tempScale","",c("Celsius","Fahrenheit"),inline= TRUE),
+                 radioButtons("timeRange","Time Scale", c("Current","All Time"), inline = TRUE)
       ) 
     } else if (input$sbMenu=="statetemps") {
       inputPanel(id="ip3",radioButtons("tempScale2","Select Scale for Map",c("Celsius","Fahrenheit"),selected="Fahrenheit",inline= TRUE))
@@ -20,8 +21,8 @@ shinyServer(function(input, output,session) {
   })
 
   source("code/locations.R", local=TRUE)
-#   source("code/stateTemps.R", local=TRUE)
-#   source("code/earthquakes.R", local=TRUE)
+   source("code/stateTemps.R", local=TRUE)
+   source("code/earthquakes.R", local=TRUE)
   
   
   

@@ -35,10 +35,9 @@ should automatically refresh every 10 minutes
 
    ---
    
-### Priorities
+### Enhancements and Issues
 
-1. Add new apps
-2. Enhance look via CSS
+
 
 
    ---

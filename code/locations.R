@@ -205,10 +205,18 @@ theLocData <- eventReactive(input$getYears,{
     startyear = input$years[1],
     endyear = input$years[2]  # tried isolate here did not seem to  work
   )
+  # get an approcimate to date number of days for use in hot cold
+  met_data <-met_data %>% 
+    mutate(cumdays=((month-1)*30+day))
+  
+ 
+  
+daysToDate <-  max(met_data[met_data$year==max(met_data$year),]$cumdays)
+  
   
   # print("data received")
   print(glimpse(met_data))
-  info = list(met_data = met_data,year1 = year1,year2 = year2)
+  info = list(met_data = met_data,year1 = year1,year2 = year2,daysToDate=daysToDate)
   #   print("met_data")
   return(info)
   
@@ -410,8 +418,11 @@ output$hotColdTable <- DT::renderDataTable({
     group_by(year) %>%
     summarize(avTemp = round(mean(temp,na.rm = T),1))
   
+  print(theLocData()$daysToDate)
+  
   meanToDate <- theLocData()$met_data %>%
-    filter(month < 7) %>%
+   # filter(month < 7) %>% # old crude way
+    filter(cumdays<=theLocData()$daysToDate) %>% 
     group_by(year) %>%
     summarize(avTempYTD = round(mean(temp,na.rm = T),1))
   
@@ -492,7 +503,10 @@ output$hotColdChart <- renderPlot({
    filter(year==max(year)) %>% 
    nrow() -> days
   
-  #yTitle <- paste0(days," days of Year")
+ print("theLocData()$daysToDate")
+ print(theLocData()$daysToDate)
+ 
+  yTitle <- paste0("First ",theLocData()$daysToDate," days of Year")
   
   p <- ggplot(combo,aes(x = year,y = count,fill = factor(cat))) +
     geom_bar(
