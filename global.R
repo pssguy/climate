@@ -1,3 +1,5 @@
+
+
 # load libraries
 
 library(lubridate)
@@ -23,41 +25,45 @@ library(DT)
 ## can now probably replace with call as is so fast
 
 allStations <- get_isd_stations()
-allStations$stationId <- paste0(allStations$usaf,"-",allStations$wban)
+allStations$stationId <-
+  paste0(allStations$usaf,"-",allStations$wban)
 
-allStations$popup <- sprintf("<table cellpadding='4' style='line-height:1'><tr>
-                        <th>%1$s</th></tr>
-                             
-                             <tr align='center'><td>Start Year: %2$s</td></tr>
-                             <tr align='center'><td>End Year: %3$s</td></tr>
-                             </table>",
-                             allStations$name,
-                             allStations$begin,
-                             allStations$end)
+allStations$popup <-
+  sprintf(
+    "<table cellpadding='4' style='line-height:1'><tr>
+    <th>%1$s</th></tr>
+    
+    <tr align='center'><td>Start Year: %2$s</td></tr>
+    <tr align='center'><td>End Year: %3$s</td></tr>
+    </table>",
+    allStations$name,
+    allStations$begin,
+    allStations$end
+  )
+
+allStations$operational <- allStations$end-allStations$begin+1
 
 countryChoice <- sort(unique(allStations$country_name))
 
 ## container for temperature table
-temp_format = htmltools::withTags(table(
-  thead(
-    tr(
-      th(colspan = 1, ''),
-      th(colspan = 2, 'Maximum',align='center'),
-      th(colspan = 2, 'Minimum'),
-      th(colspan = 2, 'Average')
-      
-    ),
-    tr(
-      th('Year'),
-      th('Date'),
-      th('Temp'),
-      th('Date'),
-      th('Temp'),
-      th('Year'),
-      th('YTD') 
-    )
+temp_format = htmltools::withTags(table(thead(
+  tr(
+    th(colspan = 1, ''),
+    th(colspan = 2, 'Maximum',align = 'center'),
+    th(colspan = 2, 'Minimum'),
+    th(colspan = 2, 'Average')
+    
+  ),
+  tr(
+    th('Year'),
+    th('Date'),
+    th('Temp'),
+    th('Date'),
+    th('Temp'),
+    th('Year'),
+    th('YTD')
   )
-))
+)))
 
 ## state temps will need revision
 
@@ -69,17 +75,11 @@ capitals <- read_csv("capitals.csv")
 
 
 
-stateTemp_format = htmltools::withTags(table(
-  thead(
-    tr(
-      th(colspan = 1, 'Rank'),
-      th(colspan = 1, 'City'),
-      th(colspan = 1, 'State'),
-      th(colspan = 1, 'Temperature'),
-      th(colspan = 1, 'Local')
-      
-    )
-  )
-))
-
-
+stateTemp_format = htmltools::withTags(table(thead(tr(
+  th(colspan = 1, 'Rank'),
+  th(colspan = 1, 'City'),
+  th(colspan = 1, 'State'),
+  th(colspan = 1, 'Temperature'),
+  th(colspan = 1, 'Local')
+  
+))))

@@ -106,23 +106,42 @@ getDay = function(data,location,session) {
 }
 
 
-# this should be start but is not even being entered
+
 output$locations <- renderLeaflet({
   print("enter locations")
   print(input$country)
   if (is.null(input$country))
     return()
   
+  if (input$timeRange=="Current") {
   df <-  allStations %>%
     
-    filter(country_name == input$country &
-             begin <= 2013 & end == 2015)
-  
+    filter(country_name == input$country 
+             & end == 2015)
+  } else {
+    df <-  allStations %>%
+      
+      filter(country_name == input$country)
+  }
   df <- data.frame(df)
+  
+  #print(glimpse(df))
+  # change strength of color dependent on number of years?
+  #operational <- df$end-df$begin+1
+  print(df$operational) # quite a few for Canada are 61 years - though some are more
+  ## should probably just add to original stations.csv
+  
+  
+  binpal <-
+    colorBin(c("#FFFF00","#FF8000","#FF0000"), df$operational,  pretty = TRUE)
+  
   df %>%    leaflet() %>%
     addTiles() %>%
     addCircles(
-      radius = 5,popup =  ~ popup,layerId =  ~ stationId
+      radius = 5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
+    )  %>% 
+    addLegend(
+      pal = binpal,values = ~ operational, position = 'bottomleft',title = "Years Operational"
     )
   
 })
@@ -155,6 +174,7 @@ output$a <- renderUI({
       "years","Select Years",min = yr1,max = yr2,value = c(yr2 - 2,yr2),sep =
         "",ticks = FALSE
     ),
+    radioButtons("chartType","Chart Style - Points are down-drillable",c("Points","Line")),
     
     actionButton("getYears","Download Data")
   )
@@ -271,19 +291,67 @@ observe({
     paste0(names(row),": ",format(row), collapse = "<br />")
   }
   
-  monthlyAv %>%
-    group_by(year) %>%
-    ggvis(~ month, ~ mean, key := ~ id) %>%
-    layer_points() %>%
-    layer_lines(stroke =  ~ as.character(year)) %>%
-    add_tooltip(all_values_1, "hover") %>%
-    add_axis("y", title = theTitle) %>%
-    add_axis("x", title = "Month") %>%
-    add_legend(scales = "stroke",title = "") %>%
-    handle_click(getDay) %>%
-    set_options(width = 480) %>%
-    bind_shiny("monthly")
+  print(str(monthlyAv))
   
+  # lines momentarily appear and then go
+    monthlyAv %>%
+      group_by(year) %>%
+      ggvis(~ month, ~ mean, key := ~ id) %>%
+      
+      layer_lines(stroke =  ~ as.factor(year)) %>%
+      layer_points() %>%
+      add_tooltip(all_values_1, "hover") %>%
+      add_axis("y", title = theTitle) %>%
+      add_axis("x", title = "Month") %>%
+      add_legend(scales = "stroke",title = "") %>%
+      handle_click(getDay) %>%
+      set_options(width = 480) %>%
+      bind_shiny("monthly")
+  
+  
+  # not the solution
+  
+  #   monthlyAv %>%
+  #     group_by(year) %>%
+  #     ggvis(~ month, ~ mean, key := ~ id) %>%
+  #    # layer_points() %>%
+  #     layer_lines(stroke =  ~ as.character(year)) %>%
+  #     add_tooltip(all_values_1, "hover") %>%
+  #     add_axis("y", title = theTitle) %>%
+  #     add_axis("x", title = "Month") %>%
+  #     add_legend(scales = "stroke",title = "") %>%
+  #     handle_click(getDay) %>%
+  #     set_options(width = 480) %>%
+  #     bind_shiny("monthly")
+  
+#   if(input$chartType=="Line"){
+#   monthlyAv %>%
+#     group_by(year) %>%
+#     ggvis(~ month, ~ mean, key := ~ id) %>%
+#    # layer_points() %>%
+#     layer_lines(stroke =  ~ as.character(year)) %>%
+#     add_tooltip(all_values_1, "hover") %>%
+#     add_axis("y", title = theTitle) %>%
+#     add_axis("x", title = "Month") %>%
+#     add_legend(scales = "stroke",title = "") %>%
+#     handle_click(getDay) %>%
+#     set_options(width = 480) %>%
+#     bind_shiny("monthly")
+#   } else {
+#     monthlyAv %>%
+#       group_by(year) %>%
+#       ggvis(~ month, ~ mean, key := ~ id) %>%
+#       layer_points() %>%
+#       #layer_lines(stroke =  ~ as.character(year)) %>%
+#       add_tooltip(all_values_1, "hover") %>%
+#       add_axis("y", title = theTitle) %>%
+#       add_axis("x", title = "Month") %>%
+#       add_legend(scales = "stroke",title = "") %>%
+#       handle_click(getDay) %>%
+#       set_options(width = 480) %>%
+#       bind_shiny("monthly")
+#   }
+#   
   
 })
 

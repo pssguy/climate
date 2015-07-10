@@ -18,5 +18,14 @@ width: 130px;
   
   /* for red headers eg climate */
   background-color: #dd4b39;
+  border-color: #fff;
   
+}
+
+/* need to make viewable */
+#downloads {
+   background-color: #fff;
+   border-color: #fff;
+   
+}
 }

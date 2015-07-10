@@ -22,11 +22,11 @@ dashboardPage(
       ),
       menuItem(
         "US State Capital Temperatures",
-        menuSubItem(
-          "Map",tabName = "statetemps", icon = icon("map-marker")
-        ),
+        menuSubItem("Map",tabName = "statetemps", icon = icon("map-marker")),
         menuSubItem("Info",tabName = "statetemps_info",icon = icon("info")),
-        menuSubItem("Data",tabName = "statetemps_data",icon = icon("database"))
+        menuSubItem("Data",tabName = "statetemps_data",icon = icon("database")),
+        menuSubItem("Code",icon = icon("code-fork"),
+                 href = "https://github.com/pssguy/fortune500")
       ),
             menuItem(
               "Weather Stations",
@@ -38,8 +38,7 @@ dashboardPage(
         menuItem("Data", tabName = "data",icon = icon("database")),
       menuItem("Info", tabName = "info",icon = icon("info")),
       
-        menuItem("Code",icon = icon("code-fork"),
-                 href = "https://github.com/pssguy/fortune500"),
+      
       
       menuItem(
         "Other Dashboards",
