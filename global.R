@@ -17,7 +17,8 @@ library(DT)
 library(stringr)
 library(ggplot2)
 library(scales)
-library(DT)
+library(R.utils)
+
 
 # load requisite files
 #allStations <- read.csv("allStations_B.csv", stringsAsFactors = F)
