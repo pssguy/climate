@@ -1,6 +1,7 @@
 
 shinyServer(function(input, output,session) {
-  
+  # for saving url as is
+  shinyURL.server(session)
   
   ## set up input menu in sidebar
   output$sb <- renderUI({

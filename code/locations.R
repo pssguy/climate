@@ -141,16 +141,31 @@ output$locations <- renderLeaflet({
   binpal <-
     colorBin(c("#FFFF00","#FF8000","#FF0000"), df$operational,  pretty = TRUE)
   
+ # write_csv(df,"problem.csv")
+  
   df %>%    leaflet() %>%
     addTiles() %>%
-    addCircleMarkers(
-      radius = 4,fillOpacity = 0.5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
-    )  %>% 
+    ## remove this bit to a proxy
+    # addCircleMarkers(
+    #   radius = 4,fillOpacity = 0.5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
+    # )  %>% 
   
     addLegend(
       pal = binpal,values = ~ operational, position = 'bottomleft',title = "Years Operational"
     )
   
+})
+
+observe({
+
+  binpal <-
+    colorBin(c("#FFFF00","#FF8000","#FF0000"), df$operational,  pretty = TRUE)
+
+  leafletProxy("locations")  %>%  # presumably "map" is from output$map data = filteredData())removed
+    clearShapes() %>%
+    addCircleMarkers(
+      radius = 4,fillOpacity = 0.5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
+    )
 })
 
 ## need to split this to get years requesteds

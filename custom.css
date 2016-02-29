@@ -1,3 +1,12 @@
+
+.addpad {
+  padding-left:20px;
+   padding-right:5px;
+}
+.addpad2 {
+ 
+   padding-right:5px;
+}
 /* redo if can get submit button lined up
 #postcode {
 width: 130px;
@@ -18,9 +27,26 @@ width: 130px;
   
   /* for red headers eg climate */
   background-color: #dd4b39;
-  border-color: #fff;  
+  border-color: #fff; 
+  
   
 }
+
+.shiny-input-container {
+  /* for red headers eg climate */
+  background-color:#dd4b39;
+  border-color: #fff;  
+  /*padding-bottom: 50px;* no impact/ 
+  
+ /*default padding: 12px 15px 0px 12px; changing has no effect*/
+}
+
+/* does not appear to have impact 
+.sidebar .shiny-input-container {
+  padding: 50px 15px 12px 12px;
+  border-bottom-color: #dd4b39;
+}
+*/
 
 /* need to make viewable */
 #downloads {
