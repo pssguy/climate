@@ -28,7 +28,7 @@ library(leaflet)
 library(dplyr)
 
 
-#wvan <-  read_rds("data/wvan.rds")
+#site <-  read_rds("data/site.rds")
 ```
 Selected Site
 =====================================
@@ -36,26 +36,44 @@ Selected Site
 ```{r data munging}
 
 # read default - prob want to do an update since last time file looked at
-wvan <-  read_rds("data/wvan.rds")
+site <-  read_rds("data/wvan.rds")
 
 # need to do some manip
-wvan$date <-  as.Date(str_sub(wvan$valid,1,10))
-wvan$doy <- str_sub(wvan$date,6,10)
-wvan$year <- as.integer(str_sub(wvan$date,1,4))
-#print(glimpse(wvan))
-test <- wvan %>% group_by(doy,year) %>%       
+site$date <-  as.Date(str_sub(site$valid,1,10))
+site$doy <- str_sub(site$date,6,10)
+site$year <- as.integer(str_sub(site$date,1,4))
+#print(glimpse(site))
+test <- site %>% group_by(doy,year) %>%       
   summarize(maxTemp=max(tmpf),maxTempC=5*(maxTemp-32)/9,
              minTemp=min(tmpf),minTempC=5*(minTemp-32)/9)
-                    
+
+
+ df <- site %>% 
+     group_by(date,year) %>% 
+     summarize(minTemp=min(tmpf),maxTemp=max(tmpf),maxTempC=5*(maxTemp-32)/9,
+               minTempC=5*(minTemp-32)/9,avTemp=mean(tmpf,na.rm=T),rainfall=sum(p01i,na.rm=T))   
+ 
+ recordHigh <-  test %>%
+  group_by(doy) %>%
+  mutate(recordHigh = max(maxTempC))  %>%
+  mutate(date = as.Date(paste0(year, "-", doy))) %>% 
+  filter(maxTempC==recordHigh)
+ 
+ recordLow <-  test %>%
+  group_by(doy) %>%
+  mutate(recordLow = min(minTempC))  %>%
+  mutate(date = as.Date(paste0(year, "-", doy))) %>% 
+  filter(minTempC==recordLow)
 
 ```
 
 
-Row {data-height=150}
+Row {data-height=110}
 -----------------------------------------------------------------------
 
 ```{r}
- inputPanel(sliderInput("daily_yr","Select Year",min=2007,max=2016,value=2016, sep=""))
+ inputPanel(sliderInput("daily_yr","Select Year",min=2007,max=2016,value=2016, sep=""),
+           radioButtons("minMax",label= "Select Temperature",choices=c("Minimum","Maximum"),inline = TRUE))
 ```
 
 Row 
@@ -69,11 +87,7 @@ output$daily <- renderPlotly({
   req(input$daily_yr)
   print(input$daily_yr)
   
-recordHigh <-  test %>%
-  group_by(doy) %>%
-  mutate(recordHigh = max(maxTempC))  %>%
-  mutate(date = as.Date(paste0(year, "-", doy))) %>% 
-  filter(maxTempC==recordHigh)
+
  
  
  # recordHigh  <-  recordHigh  %>% 
@@ -81,6 +95,9 @@ recordHigh <-  test %>%
  #              mutate(date=as.Date(paste0(year,"-",doy)))
  
  recordHighYear <-  recordHigh   %>% 
+              filter(year==input$daily_yr)
+ 
+ recordLowYear <-  recordLow   %>% 
               filter(year==input$daily_yr)
  
  ## set axes
@@ -95,114 +112,37 @@ recordHigh <-  test %>%
             side = "right",
             title = "inches"
             )
+
+             if(input$daily_yr==2016) {
+theTitle <- paste0("Precipitation and ", input$minMax, " temps West Vancouver ",input$daily_yr," to date
+                   <br>Zoom and Hove for details")
+ } else {
+  theTitle <- paste0("Precipitation and ", input$minMax, " temps West Vancouver ",input$daily_yr,
+                     "<br>Zoom and Hove for details")
+}
  
- wvan %>% 
-     group_by(date,year) %>% 
-     summarize(minTemp=min(tmpf),maxTemp=max(tmpf),maxTempC=5*(maxTemp-32)/9,avTemp=mean(tmpf,na.rm=T),rainfall=sum(p01i,na.rm=T)) %>% 
+            if(input$minMax=="Maximum") {
+ df %>% 
      filter(year==input$daily_yr) %>% 
      plot_ly(x=date,y=rainfall,type="bar", name="Precipitation ins", yaxis = "y2")   %>% 
      add_trace(x=date,y=maxTempC,mode="lines",name="Temp C", yaxis = "y1") %>%
      add_trace(data=recordHighYear,x=date,y=maxTempC,mode="markers",colors="Set1",marker=list(color="red"), name= "Record last decade") %>% 
-     layout(title = paste0("Precipitation and Max temps West Vancouver ",input$daily_yr," to date"),
+     layout(title = theTitle,
             xaxis=list(title=" "),
             yaxis=list(title="Degree C",tickfont = list(color = "orange")),
             yaxis2 = y2)      
-   })
-
+   
+} else {
+  df %>% 
+     filter(year==input$daily_yr) %>% 
+     plot_ly(x=date,y=rainfall,type="bar", name="Precipitation ins", yaxis = "y2")   %>% 
+     add_trace(x=date,y=minTempC,mode="lines",name="Temp C", yaxis = "y1") %>%
+     add_trace(data=recordLowYear,x=date,y=minTempC,mode="markers",colors="Set1",marker=list(color="green"), name= "Record last decade") %>% 
+     layout(title = theTitle,
+            xaxis=list(title=" "),
+            yaxis=list(title="Degree C",tickfont = list(color = "orange")),
+            yaxis2 = y2)  
+}
+})
 plotlyOutput("daily")
 ```
-<!-- Hottest Days -->
-<!-- =====================================  -->
-
-<!-- Row {data-height=150} -->
-<!-- ----------------------------------------------------------------------- -->
-
-<!-- ```{r} -->
-<!--  inputPanel(selectInput("hot_city","Select City",c("ORD","SFO","HEA"),selected="ORD")) -->
-<!-- ``` -->
-
-<!-- ```{r hottest calcs} -->
-
-<!-- hotCity_data <- reactive({ -->
-
-<!--   req(input$hot_city) -->
-<!--   print(input$hot_city) -->
-<!-- ## will need to check earliest year first -->
-<!-- for (i in 2016:2000) { -->
-<!--   print(i) -->
-
-<!--   tempdf <- getWeatherForYear(input$hot_city, i) -->
-<!--   print("nrow(tempdf)") -->
-<!--   print(nrow(tempdf)) -->
-<!-- if(!is.null(tempdf)) { ## assumes once data exists it keeps coming  -->
-<!-- if (i!=2016) { -->
-<!--   df <- rbind(df,tempdf) -->
-<!-- } else { -->
-<!--   df <- tempdf -->
-<!-- } -->
-<!-- } -->
-<!-- } -->
-<!--   #Warning: Error in <-: 'names' attribute [23] must be the same length as the vector [20] -->
-<!--   print(glimpse(df)) -->
-<!-- df$cityID <- input$hot_city -->
-
-<!-- print(glimpse(df)) -->
-<!--  df$Date <- as.Date(df$Date) # comes as time -->
-<!-- df$year <- year(df$Date) -->
-<!-- df$month <- month(df$Date) -->
-<!-- df$day <- day(df$Date) -->
-
-<!-- hottest <- df %>%  -->
-<!--  # select(-Date) %>%  -->
-<!--    group_by(month,day) %>%  -->
-<!--    mutate(recordMax=max(Max_TemperatureC,na.rm=T)) %>%  -->
-<!--    mutate(maxTrue = ifelse(Max_TemperatureC==recordMax,1,0)) %>%  -->
-<!--   mutate(col = ifelse(Max_TemperatureC==recordMax,"#ff0000","#ffffff")) %>%  -->
-<!--   select(year,max=Max_TemperatureC,maxTrue,Date,col) -->
-
-<!-- hottest$wday <- wday(hottest$Date, label = TRUE, abbr = TRUE) -->
-<!--     hottest$week <- week(hottest$Date) -->
-<!-- #}   -->
-<!--     return(hottest) -->
-<!-- }) -->
-<!-- ``` -->
-
-<!-- Row -->
-<!-- ----------------------------------------------------------------------- -->
-
-<!-- ### By Year -->
-
-<!-- ```{r} -->
-
-
-<!--   # output$hottestDaysByYear <- renderPlotly({ -->
-<!--   # hotCity_data() %>%  -->
-<!--   #     group_by(year) %>%  -->
-<!--   #     summarize(hottest=sum(maxTrue)) %>%  -->
-<!--   #     plot_ly(x=year,y=hottest,type="bar") %>%  -->
-<!--   #     layout(  -->
-<!--   #            title="Number of Days which were hottest over period") %>%  -->
-<!--   #     config(displayModeBar = F,showLink = F) -->
-<!--   # }) -->
-<!--   #  -->
-<!--   # plotlyOutput("hottestDaysByYear") -->
-<!-- ``` -->
-
-<!-- Row -->
-<!-- ----------------------------------------------------------------------- -->
-
-<!-- ### Test -->
-
-<!-- ```{r} -->
-
-
-<!--   output$test <- DT::renderDataTable({ -->
-
-<!--     print(glimpse(hotCity_data())) -->
-
-<!--   hotCity_data() %>%  -->
-<!--       DT::datatable() -->
-<!--   }) -->
-
-<!--  DT::dataTableOutput("test") -->
-<!-- ``` -->
