@@ -20,6 +20,7 @@ library(riem)
 library(flexdashboard)
 library(readr)
 library(lubridate)
+library(stringr)
 library(plotly)
 library(DT)
 library(leaflet)
@@ -27,7 +28,7 @@ library(leaflet)
 library(dplyr)
 
 
-wvan <-  read_rds("data/wvan.rds")
+#wvan <-  read_rds("data/wvan.rds")
 ```
 Selected Site
 =====================================
@@ -40,7 +41,8 @@ wvan <-  read_rds("data/wvan.rds")
 # need to do some manip
 wvan$date <-  as.Date(str_sub(wvan$valid,1,10))
 wvan$doy <- str_sub(wvan$date,6,10)
-wvan$year <- str_sub(wvan$date,1,4)
+wvan$year <- as.integer(str_sub(wvan$date,1,4))
+#print(glimpse(wvan))
 test <- wvan %>% group_by(doy,year) %>%       
   summarize(maxTemp=max(tmpf),maxTempC=5*(maxTemp-32)/9,
              minTemp=min(tmpf),minTempC=5*(minTemp-32)/9)
@@ -53,7 +55,7 @@ Row {data-height=150}
 -----------------------------------------------------------------------
 
 ```{r}
- inputPanel(sliderInput("daily_yr","Select Year",min=2007,max=2016,value=2016))
+ inputPanel(sliderInput("daily_yr","Select Year",min=2007,max=2016,value=2016, sep=""))
 ```
 
 Row 
@@ -62,6 +64,11 @@ Row
 ```{r daily temp and rainfall}
 
 output$daily <- renderPlotly({
+  
+  
+  req(input$daily_yr)
+  print(input$daily_yr)
+  
 recordHigh <-  test %>%
   group_by(doy) %>%
   mutate(recordHigh = max(maxTempC))  %>%
@@ -74,7 +81,7 @@ recordHigh <-  test %>%
  #              mutate(date=as.Date(paste0(year,"-",doy)))
  
  recordHighYear <-  recordHigh   %>% 
-              filter(date>="2016-01-01")
+              filter(year==input$daily_yr)
  
  ## set axes
  
@@ -90,13 +97,13 @@ recordHigh <-  test %>%
             )
  
  wvan %>% 
-     group_by(date) %>% 
+     group_by(date,year) %>% 
      summarize(minTemp=min(tmpf),maxTemp=max(tmpf),maxTempC=5*(maxTemp-32)/9,avTemp=mean(tmpf,na.rm=T),rainfall=sum(p01i,na.rm=T)) %>% 
-     filter(date>="2016-01-01") %>% 
+     filter(year==input$daily_yr) %>% 
      plot_ly(x=date,y=rainfall,type="bar", name="Precipitation ins", yaxis = "y2")   %>% 
      add_trace(x=date,y=maxTempC,mode="lines",name="Temp C", yaxis = "y1") %>%
      add_trace(data=recordHighYear,x=date,y=maxTempC,mode="markers",colors="Set1",marker=list(color="red"), name= "Record last decade") %>% 
-     layout(title = "Precipitation and Max temps West Vancouver 2016 to date",
+     layout(title = paste0("Precipitation and Max temps West Vancouver ",input$daily_yr," to date"),
             xaxis=list(title=" "),
             yaxis=list(title="Degree C",tickfont = list(color = "orange")),
             yaxis2 = y2)      
