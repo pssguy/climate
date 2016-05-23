@@ -18,7 +18,7 @@ library(stringr)
 library(ggplot2)
 library(scales)
 library(R.utils)
-library(shinyURL)
+library(shinyURL) # tried removing see if that was error but no good
 
 
 # load requisite files

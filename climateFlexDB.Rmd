@@ -1,0 +1,201 @@
+---
+title: "Climate"
+author: "pssguy"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: [ menu ]
+    source_code: embed
+runtime: shiny
+---
+
+<!-- Learn more about flexdashboard at https://rstudio.github.io/flexdashboard -->
+<!-- Problem is time taken to download info -->
+
+```{r setup, include=FALSE}
+# Load packages and initialize data here
+library(weatherData)
+library(riem)
+
+library(flexdashboard)
+library(readr)
+library(lubridate)
+library(plotly)
+library(DT)
+library(leaflet)
+
+library(dplyr)
+
+
+wvan <-  read_rds("data/wvan.rds")
+```
+Selected Site
+=====================================
+
+```{r data munging}
+
+# read default - prob want to do an update since last time file looked at
+wvan <-  read_rds("data/wvan.rds")
+
+# need to do some manip
+wvan$date <-  as.Date(str_sub(wvan$valid,1,10))
+wvan$doy <- str_sub(wvan$date,6,10)
+wvan$year <- str_sub(wvan$date,1,4)
+test <- wvan %>% group_by(doy,year) %>%       
+  summarize(maxTemp=max(tmpf),maxTempC=5*(maxTemp-32)/9,
+             minTemp=min(tmpf),minTempC=5*(minTemp-32)/9)
+                    
+
+```
+
+
+Row {data-height=150}
+-----------------------------------------------------------------------
+
+```{r}
+ inputPanel(sliderInput("daily_yr","Select Year",min=2007,max=2016,value=2016))
+```
+
+Row 
+-----------------------------------------------------------------------
+
+```{r daily temp and rainfall}
+
+output$daily <- renderPlotly({
+recordHigh <-  test %>%
+  group_by(doy) %>%
+  mutate(recordHigh = max(maxTempC))  %>%
+  mutate(date = as.Date(paste0(year, "-", doy))) %>% 
+  filter(maxTempC==recordHigh)
+ 
+ 
+ # recordHigh  <-  recordHigh  %>% 
+ #              filter(maxTempC==recordHigh) %>% 
+ #              mutate(date=as.Date(paste0(year,"-",doy)))
+ 
+ recordHighYear <-  recordHigh   %>% 
+              filter(date>="2016-01-01")
+ 
+ ## set axes
+ 
+ y1 <- list(tickfont = list(color = "orange"),
+            side = "left",
+            title = "Degree C")
+            
+            y2 <- list(
+            tickfont = list(color = "blue"),
+            overlaying = "y",
+            side = "right",
+            title = "inches"
+            )
+ 
+ wvan %>% 
+     group_by(date) %>% 
+     summarize(minTemp=min(tmpf),maxTemp=max(tmpf),maxTempC=5*(maxTemp-32)/9,avTemp=mean(tmpf,na.rm=T),rainfall=sum(p01i,na.rm=T)) %>% 
+     filter(date>="2016-01-01") %>% 
+     plot_ly(x=date,y=rainfall,type="bar", name="Precipitation ins", yaxis = "y2")   %>% 
+     add_trace(x=date,y=maxTempC,mode="lines",name="Temp C", yaxis = "y1") %>%
+     add_trace(data=recordHighYear,x=date,y=maxTempC,mode="markers",colors="Set1",marker=list(color="red"), name= "Record last decade") %>% 
+     layout(title = "Precipitation and Max temps West Vancouver 2016 to date",
+            xaxis=list(title=" "),
+            yaxis=list(title="Degree C",tickfont = list(color = "orange")),
+            yaxis2 = y2)      
+   })
+
+plotlyOutput("daily")
+```
+<!-- Hottest Days -->
+<!-- =====================================  -->
+
+<!-- Row {data-height=150} -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- ```{r} -->
+<!--  inputPanel(selectInput("hot_city","Select City",c("ORD","SFO","HEA"),selected="ORD")) -->
+<!-- ``` -->
+
+<!-- ```{r hottest calcs} -->
+
+<!-- hotCity_data <- reactive({ -->
+
+<!--   req(input$hot_city) -->
+<!--   print(input$hot_city) -->
+<!-- ## will need to check earliest year first -->
+<!-- for (i in 2016:2000) { -->
+<!--   print(i) -->
+
+<!--   tempdf <- getWeatherForYear(input$hot_city, i) -->
+<!--   print("nrow(tempdf)") -->
+<!--   print(nrow(tempdf)) -->
+<!-- if(!is.null(tempdf)) { ## assumes once data exists it keeps coming  -->
+<!-- if (i!=2016) { -->
+<!--   df <- rbind(df,tempdf) -->
+<!-- } else { -->
+<!--   df <- tempdf -->
+<!-- } -->
+<!-- } -->
+<!-- } -->
+<!--   #Warning: Error in <-: 'names' attribute [23] must be the same length as the vector [20] -->
+<!--   print(glimpse(df)) -->
+<!-- df$cityID <- input$hot_city -->
+
+<!-- print(glimpse(df)) -->
+<!--  df$Date <- as.Date(df$Date) # comes as time -->
+<!-- df$year <- year(df$Date) -->
+<!-- df$month <- month(df$Date) -->
+<!-- df$day <- day(df$Date) -->
+
+<!-- hottest <- df %>%  -->
+<!--  # select(-Date) %>%  -->
+<!--    group_by(month,day) %>%  -->
+<!--    mutate(recordMax=max(Max_TemperatureC,na.rm=T)) %>%  -->
+<!--    mutate(maxTrue = ifelse(Max_TemperatureC==recordMax,1,0)) %>%  -->
+<!--   mutate(col = ifelse(Max_TemperatureC==recordMax,"#ff0000","#ffffff")) %>%  -->
+<!--   select(year,max=Max_TemperatureC,maxTrue,Date,col) -->
+
+<!-- hottest$wday <- wday(hottest$Date, label = TRUE, abbr = TRUE) -->
+<!--     hottest$week <- week(hottest$Date) -->
+<!-- #}   -->
+<!--     return(hottest) -->
+<!-- }) -->
+<!-- ``` -->
+
+<!-- Row -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- ### By Year -->
+
+<!-- ```{r} -->
+
+
+<!--   # output$hottestDaysByYear <- renderPlotly({ -->
+<!--   # hotCity_data() %>%  -->
+<!--   #     group_by(year) %>%  -->
+<!--   #     summarize(hottest=sum(maxTrue)) %>%  -->
+<!--   #     plot_ly(x=year,y=hottest,type="bar") %>%  -->
+<!--   #     layout(  -->
+<!--   #            title="Number of Days which were hottest over period") %>%  -->
+<!--   #     config(displayModeBar = F,showLink = F) -->
+<!--   # }) -->
+<!--   #  -->
+<!--   # plotlyOutput("hottestDaysByYear") -->
+<!-- ``` -->
+
+<!-- Row -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- ### Test -->
+
+<!-- ```{r} -->
+
+
+<!--   output$test <- DT::renderDataTable({ -->
+
+<!--     print(glimpse(hotCity_data())) -->
+
+<!--   hotCity_data() %>%  -->
+<!--       DT::datatable() -->
+<!--   }) -->
+
+<!--  DT::dataTableOutput("test") -->
+<!-- ``` -->

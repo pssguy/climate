@@ -1,5 +1,5 @@
 library(shinyURL)
-dashboardPage(
+dashboardPage(title = "Climate",
   skin = "red",
   # dashboardHeader(title = img(src="logo.jpg", height = 50, align = "left")),
   dashboardHeader(title = "Climate"),
@@ -31,7 +31,7 @@ dashboardPage(
         menuSubItem("Info",tabName = "stations_info",icon = icon("info"))
       ),
       tags$hr(),
-      shinyURL.ui(label="Copy URL for Sharing",copyURL=FALSE), # cannot set id for CSS purposes
+   shinyURL.ui(label="Copy URL for Sharing",copyURL=FALSE), # cannot set id for CSS purposes
     
     
     

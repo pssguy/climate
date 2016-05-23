@@ -143,12 +143,14 @@ output$locations <- renderLeaflet({
   
  # write_csv(df,"problem.csv")
   
+  print(glimpse(df)) # inc stationId which is supposed to be layerId when clicked on
+  
   df %>%    leaflet() %>%
     addTiles() %>%
-    ## remove this bit to a proxy
-    # addCircleMarkers(
-    #   radius = 4,fillOpacity = 0.5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
-    # )  %>% 
+    # remove this bit to a proxy
+    addCircleMarkers(
+      radius = 4,fillOpacity = 0.5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
+    )  %>%
   
     addLegend(
       pal = binpal,values = ~ operational, position = 'bottomleft',title = "Years Operational"
@@ -156,23 +158,38 @@ output$locations <- renderLeaflet({
   
 })
 
-observe({
-
-  binpal <-
-    colorBin(c("#FFFF00","#FF8000","#FF0000"), df$operational,  pretty = TRUE)
-
-  leafletProxy("locations")  %>%  # presumably "map" is from output$map data = filteredData())removed
-    clearShapes() %>%
-    addCircleMarkers(
-      radius = 4,fillOpacity = 0.5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
-    )
-})
+# observe({
+# 
+#   binpal <-
+#     colorBin(c("#FFFF00","#FF8000","#FF0000"), df$operational,  pretty = TRUE)
+# 
+#   leafletProxy("locations")  %>%  # presumably "map" is from output$map data = filteredData())removed
+#     clearShapes() %>%
+#     addCircleMarkers(
+#       radius = 4,fillOpacity = 0.5,popup =  ~ popup,layerId =  ~ stationId,color = ~ binpal(operational)
+#     )
+# })
 
 ## need to split this to get years requesteds
 
+
+observeEvent(input$locations_marker_click, {
+  print("map clicked")
+  print(input$locations_marker_click$id)
+ })
+
 output$a <- renderUI({
+  
+#  req(input$locations_marker_click)
+  
   print("enter ui")
   print(input$locations_marker_click$id)
+  print("that was input$locations_marker_click$id") # NULL
+  
+  print(input$locations_click)
+  print(input$locations_bounds) # shows up as soon as map viewed (as anticipated)
+  print(input$locations_zoom)  #shows up as soon as map viewed (as anticipated) - but neither change as map alters
+  
   if (is.null(input$locations_marker_click$id))
     return()
   
@@ -229,13 +246,14 @@ theLocData <- eventReactive(input$getYears,{
   met_data <- get_isd_station_data(
     station_id = station,
     startyear = input$years[1],
-    endyear = input$years[2]  # tried isolate here did not seem to  work
-  )
+    endyear = input$years[2],  # tried isolate here did not seem to  work
+    select_additional_data = "AA1" # attempt to get rain data as well didnt work for random one - try YVR as rich had -took an age but did download
+     )
   # get an approcimate to date number of days for use in hot cold
   met_data <-met_data %>% 
     mutate(cumdays=((month-1)*30+day))
   
- 
+ print(glimpse(met_data)) # 19obs
   
 daysToDate <-  max(met_data[met_data$year==max(met_data$year),]$cumdays)
   
